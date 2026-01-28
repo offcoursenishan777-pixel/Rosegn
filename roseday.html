@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Happy Rose Day 🌹</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500&family=Inter:wght@300;500&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+    height:100vh;
+    overflow:hidden;
+    background:radial-gradient(circle at top,#ffd1dc,#f6b1c3,#c874b2);
+    font-family:'Inter',sans-serif;
+    color:#fff;
+}
+.page{
+    position:absolute;
+    inset:0;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    flex-direction:column;
+}
+.page.active{display:flex}
+
+/* PAGE 1 */
+.title{
+    font-family:'Playfair Display',serif;
+    font-size:42px;
+    margin-bottom:40px;
+}
+.heart-btn{
+    font-size:120px;
+    cursor:pointer;
+    animation:beat 1.4s infinite;
+}
+@keyframes beat{
+    0%,100%{transform:scale(1)}
+    50%{transform:scale(1.25)}
+}
+.hint{opacity:.8;margin-top:10px}
+
+/* PAGE 2 GAME */
+#game{
+    width:100%;
+    height:100%;
+    position:relative;
+}
+.drop{
+    position:absolute;
+    font-size:30px;
+    cursor:pointer;
+}
+.hud{
+    position:absolute;
+    top:20px;
+    left:20px;
+}
+.next{
+    position:absolute;
+    bottom:40px;
+    padding:12px 28px;
+    background:#fff;
+    color:#c03b6f;
+    border-radius:40px;
+    display:none;
+    cursor:pointer;
+}
+
+/* PAGE 3 LETTER */
+.paper{
+    width:85%;
+    max-width:340px;
+    background:#fff7e6;
+    color:#3a2c1e;
+    border-radius:14px;
+    padding:24px;
+    text-align:center;
+}
+.thread{
+    height:6px;
+    background:#a55b2a;
+    margin-bottom:14px;
+}
+.scissor{
+    font-size:36px;
+    cursor:pointer;
+}
+.note{
+    display:none;
+    font-family:'Playfair Display',serif;
+    font-size:22px;
+    animation:unfold .8s ease forwards;
+}
+@keyframes unfold{
+    from{opacity:0;transform:translateY(-12px)}
+    to{opacity:1;transform:translateY(0)}
+}
+.cta{
+    margin-top:18px;
+    padding:10px 24px;
+    background:#c03b6f;
+    color:#fff;
+    border-radius:30px;
+    cursor:pointer;
+}
+
+/* PAGE 4 FINAL */
+#finale{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    position:relative;
+    overflow:hidden;
+}
+#final-heart{
+    font-size:150px;
+    animation:beat 1s infinite;
+    filter:drop-shadow(0 0 30px rgba(255,60,120,.9));
+}
+.explode{
+    animation:explode .6s forwards;
+}
+@keyframes explode{
+    to{
+        transform:scale(4);
+        opacity:0;
+        filter:blur(8px);
+    }
+}
+#bouquet{
+    position:absolute;
+    font-size:100px;
+    opacity:0;
+    transform:scale(.2);
+}
+.fly{
+    animation:fly 1.8s ease-out forwards;
+}
+@keyframes fly{
+    0%{opacity:0;transform:scale(.2)}
+    60%{opacity:1;transform:scale(2)}
+    100%{opacity:1;transform:scale(3)}
+}
+.rose{
+    position:absolute;
+    font-size:26px;
+    animation:fall linear infinite;
+}
+@keyframes fall{
+    from{top:-40px;opacity:0}
+    to{top:110%;opacity:1}
+}
+.again{
+    position:absolute;
+    bottom:30px;
+    padding:10px 26px;
+    background:#fff;
+    color:#c03b6f;
+    border-radius:30px;
+    cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<audio id="music" loop>
+    <source src="https://cdn.pixabay.com/audio/2022/03/15/audio_c9b68e2fa3.mp3">
+</audio>
+
+<!-- PAGE 1 -->
+<div class="page active" id="p1">
+    <div class="title">Welcome to my heart</div>
+    <div class="heart-btn" onclick="go(2)">❤️</div>
+    <div class="hint">Tap on the heart</div>
+</div>
+
+<!-- PAGE 2 -->
+<div class="page" id="p2">
+    <div id="game">
+        <div class="hud" id="count">Roses: 0 / 5</div>
+        <div class="next" id="next" onclick="go(3)">
+            Congratulations 🎉 Move to next page
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 3 -->
+<div class="page" id="p3">
+    <div class="paper">
+        <div class="thread" id="thread"></div>
+        <div class="scissor" onclick="cut()">✂️</div>
+        <div class="note" id="note">
+            Happy Rose Day Chinnammmaaaa…  
+            🫶💋🌹💗
+            <div class="cta" onclick="go(4)">Here is your gift</div>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE 4 -->
+<div class="page" id="p4">
+    <div id="finale">
+        <div id="final-heart">❤️</div>
+        <div id="bouquet">💐</div>
+    </div>
+    <div class="again" onclick="go(1)">Again</div>
+</div>
+
+<script>
+const emojis=["🌹","💗","♥️","💋","🫶","😁","🧿"];
+let roses=0;
+
+function go(n){
+    document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+    document.getElementById('p'+n).classList.add('active');
+    document.getElementById('music').play();
+    if(n===2) game();
+    if(n===4) finale();
+}
+
+function game(){
+    roses=0;
+    const g=document.getElementById("game");
+    document.getElementById("count").innerText="Roses: 0 / 5";
+    document.getElementById("next").style.display="none";
+
+    const drop=setInterval(()=>{
+        if(roses>=5){clearInterval(drop);return;}
+        const e=document.createElement("div");
+        e.className="drop";
+        e.innerText=emojis[Math.floor(Math.random()*emojis.length)];
+        e.style.left=Math.random()*90+"%";
+        e.style.top="-40px";
+        g.appendChild(e);
+
+        const fall=setInterval(()=>{
+            e.style.top=(e.offsetTop+4)+"px";
+            if(e.offsetTop>innerHeight){e.remove();clearInterval(fall);}
+        },30);
+
+        if(e.innerText==="🌹"){
+            e.onclick=()=>{
+                roses++;
+                document.getElementById("count").innerText=`Roses: ${roses} / 5`;
+                e.remove();
+                if(roses===5) document.getElementById("next").style.display="block";
+            }
+        }
+    },700);
+}
+
+function cut(){
+    document.getElementById("thread").style.display="none";
+    document.getElementById("note").style.display="block";
+}
+
+function finale(){
+    const heart=document.getElementById("final-heart");
+    const bouquet=document.getElementById("bouquet");
+    const f=document.getElementById("finale");
+
+    setTimeout(()=>heart.classList.add("explode"),1800);
+
+    setTimeout(()=>{
+        heart.style.display="none";
+        bouquet.classList.add("fly");
+    },2400);
+
+    setInterval(()=>{
+        const r=document.createElement("div");
+        r.className="rose";
+        r.innerText="🌹";
+        r.style.left=Math.random()*100+"%";
+        r.style.animationDuration=2+Math.random()*3+"s";
+        f.appendChild(r);
+        setTimeout(()=>r.remove(),5000);
+    },200);
+}
+</script>
+
+</body>
+</html>
